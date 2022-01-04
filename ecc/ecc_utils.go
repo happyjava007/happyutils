@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/x509"
-	"encoding/base64"
 	"encoding/hex"
 	"math/big"
 	"strings"
@@ -21,7 +20,7 @@ func GenKeyPair() (privateKey string, publicKey string, e error) {
 	if e != nil {
 		return "", "", e
 	}
-	privateKey = base64.StdEncoding.EncodeToString(ecPrivateKey)
+	privateKey = hex.EncodeToString(ecPrivateKey)
 
 	X := priKey.X
 	Y := priKey.Y
@@ -33,13 +32,13 @@ func GenKeyPair() (privateKey string, publicKey string, e error) {
 	if e != nil {
 		return "", "", e
 	}
-	public := string(xStr) + "+" + string(yStr)
-	publicKey = base64.StdEncoding.EncodeToString([]byte(public))
+	public := string(xStr) + "," + string(yStr)
+	publicKey = hex.EncodeToString([]byte(public))
 	return
 }
 
 func BuildPrivateKey(privateKeyStr string) (priKey *ecdsa.PrivateKey, e error) {
-	bytes, e := base64.StdEncoding.DecodeString(privateKeyStr)
+	bytes, e := hex.DecodeString(privateKeyStr)
 	if e != nil {
 		return nil, e
 	}
@@ -51,11 +50,11 @@ func BuildPrivateKey(privateKeyStr string) (priKey *ecdsa.PrivateKey, e error) {
 }
 
 func BuildPublicKey(publicKeyStr string) (pubKey *ecdsa.PublicKey, e error) {
-	bytes, e := base64.StdEncoding.DecodeString(publicKeyStr)
+	bytes, e := hex.DecodeString(publicKeyStr)
 	if e != nil {
 		return nil, e
 	}
-	split := strings.Split(string(bytes), "+")
+	split := strings.Split(string(bytes), ",")
 	xStr := split[0]
 	yStr := split[1]
 	x := new(big.Int)
@@ -78,37 +77,45 @@ func Sign(content string, privateKeyStr string) (signature string, e error) {
 	if e != nil {
 		return "", e
 	}
-	r, s, e := ecdsa.Sign(rand.Reader, priKey, []byte(hash(content)))
+	return SignWithStruct(content, priKey)
+}
+
+func SignWithStruct(content string, privateKey *ecdsa.PrivateKey) (signature string, e error) {
+	r, s, e := ecdsa.Sign(rand.Reader, privateKey, []byte(hash(content)))
 	if e != nil {
 		return "", e
 	}
 	rt, e := r.MarshalText()
 	st, e := s.MarshalText()
-	signStr := string(rt) + "+" + string(st)
+	signStr := string(rt) + "," + string(st)
 	signature = hex.EncodeToString([]byte(signStr))
 	return
 }
 
 func VerifySign(content string, signature string, publicKeyStr string) bool {
+	pubKey, e := BuildPublicKey(publicKeyStr)
+	if e != nil {
+		return false
+	}
+	return VerifyWithStruct(content, signature, pubKey)
+}
+
+func VerifyWithStruct(content string, signature string, publicKey *ecdsa.PublicKey) bool {
 	decodeSign, e := hex.DecodeString(signature)
 	if e != nil {
 		return false
 	}
-	split := strings.Split(string(decodeSign), "+")
+	split := strings.Split(string(decodeSign), ",")
 	rStr := split[0]
 	sStr := split[1]
 	rr := new(big.Int)
 	ss := new(big.Int)
 	e = rr.UnmarshalText([]byte(rStr))
 	e = ss.UnmarshalText([]byte(sStr))
-	pubKey, e := BuildPublicKey(publicKeyStr)
-	if e != nil {
-		return false
-	}
-	return ecdsa.Verify(pubKey, []byte(hash(content)), rr, ss)
+	return ecdsa.Verify(publicKey, []byte(hash(content)), rr, ss)
 }
 
 func hash(data string) string {
 	sum := sha256.Sum256([]byte(data))
-	return base64.StdEncoding.EncodeToString(sum[:])
+	return hex.EncodeToString(sum[:])
 }
