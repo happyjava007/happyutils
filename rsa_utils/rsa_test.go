@@ -1,4 +1,4 @@
-package rsa
+package rsa_utils
 
 import "testing"
 

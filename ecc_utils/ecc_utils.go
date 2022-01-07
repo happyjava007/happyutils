@@ -1,4 +1,4 @@
-package ecc
+package ecc_utils
 
 import (
 	"crypto/ecdsa"
