@@ -110,3 +110,8 @@ func TestParseStruct(t *testing.T) {
 		t.Log(ToJsonString(u))
 	}
 }
+
+func TestToJsonStringIgnoreErr(t *testing.T) {
+	arr := []string{"apple", "banana"}
+	t.Log(ToJsonStringIgnoreErr(arr))
+}

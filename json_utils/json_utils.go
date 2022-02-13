@@ -3,6 +3,7 @@ package json_utils
 import (
 	"encoding/json"
 	"github.com/bitly/go-simplejson"
+	"log"
 )
 
 func ToJsonString(v interface{}) (string, error) {
@@ -14,6 +15,18 @@ func ToJsonString(v interface{}) (string, error) {
 		return "", err
 	}
 	return string(bytes), nil
+}
+
+func ToJsonStringIgnoreErr(v interface{}) string {
+	if v == nil {
+		return "{}"
+	}
+	bytes, err := json.Marshal(v)
+	if err != nil {
+		log.Println("ToJsonStringIgnoreErr error:", err)
+		return "{}"
+	}
+	return string(bytes)
 }
 
 func ParseObject(json string) (*simplejson.Json, error) {

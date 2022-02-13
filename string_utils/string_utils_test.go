@@ -28,3 +28,29 @@ func TestContainsAny(t *testing.T) {
 	s2 := "哈"
 	t.Log(strings.ContainsAny(s1, s2))
 }
+
+func TestSubString(t *testing.T) {
+	str := "哈皮牛逼啊"
+	subString := SubString(str, 2, 5)
+	t.Log(subString)
+}
+
+func TestSubStringBetween(t *testing.T) {
+	str := "哈Happyjava皮牛逼啊"
+	between := SubStringBetween(str, "Ha", "牛逼")
+	t.Log(between)
+
+	str = "https://www.baidu.com/apple"
+	between = SubStringBetween(str, "//", "/")
+	t.Log(between)
+}
+
+func TestSubStringBetweenExclude(t *testing.T) {
+	str := "哈Happyjava皮牛逼啊"
+	exclude := SubStringBetweenExclude(str, "Ha", "牛逼")
+	t.Log(exclude)
+
+	str = "https://www.baidu.com/apple"
+	exclude = SubStringBetweenExclude(str, "//", "/")
+	t.Log(exclude)
+}
