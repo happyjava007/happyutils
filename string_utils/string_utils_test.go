@@ -31,26 +31,41 @@ func TestContainsAny(t *testing.T) {
 
 func TestSubString(t *testing.T) {
 	str := "哈皮牛逼啊"
-	subString := SubString(str, 2, 5)
-	t.Log(subString)
+	substring, err := Substring(str, 2, 5)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(substring)
 }
 
-func TestSubStringBetween(t *testing.T) {
+func TestSubstringBetween(t *testing.T) {
 	str := "哈Happyjava皮牛逼啊"
-	between := SubStringBetween(str, "Ha", "牛逼")
+	between, err := SubstringBetween(str, "Ha", "牛逼")
+	if err != nil {
+		t.Fatal(err)
+	}
 	t.Log(between)
 
 	str = "https://www.baidu.com/apple"
-	between = SubStringBetween(str, "//", "/")
-	t.Log(between)
+	substringBetween, err := SubstringBetween(str, "//", "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(substringBetween)
 }
 
+//
 func TestSubStringBetweenExclude(t *testing.T) {
 	str := "哈Happyjava皮牛逼啊"
-	exclude := SubStringBetweenExclude(str, "Ha", "牛逼")
+	exclude, _ := SubstringBetweenExclude(str, "Ha", "牛逼")
 	t.Log(exclude)
 
 	str = "https://www.baidu.com/apple"
-	exclude = SubStringBetweenExclude(str, "//", "/")
+	exclude, _ = SubstringBetweenExclude(str, "//", "/")
 	t.Log(exclude)
+
+	t.Log(SubstringBetweenExclude("哈皮世界第一啊", "第一", "哈皮"))
+
+	t.Log(SubstringBetweenExclude("哈皮世界", "哈皮", "哈皮"))
+
 }
