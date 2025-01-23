@@ -38,6 +38,14 @@ func EncryptByPublicKey(content string, publicKey *rsa.PublicKey) (string, error
 	return hex.EncodeToString(encrypt), err
 }
 
+func EncryptByPublicKeyStr(content string, publicKeyStr string) (string, error) {
+	publicKey, err := BuildPublicKey(publicKeyStr)
+	if err != nil {
+		return "", err
+	}
+	return EncryptByPublicKey(content, publicKey)
+}
+
 func DecryptByPrivateKey(content string, privateKey *rsa.PrivateKey) (string, error) {
 	decodeString, err := hex.DecodeString(content)
 	if err != nil {
@@ -48,4 +56,12 @@ func DecryptByPrivateKey(content string, privateKey *rsa.PrivateKey) (string, er
 		return "", err
 	}
 	return string(decrypt), nil
+}
+
+func DecryptByPrivateKeyStr(content string, privateKeyStr string) (string, error) {
+	privateKey, err := BuildPrivateKey(privateKeyStr)
+	if err != nil {
+		return "", err
+	}
+	return DecryptByPrivateKey(content, privateKey)
 }
